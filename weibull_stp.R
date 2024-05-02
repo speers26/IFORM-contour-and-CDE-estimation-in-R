@@ -1,9 +1,7 @@
 # -------------------------------------------------------------------------
 
-setwd("~/GitHub/env-contours")
-source("~/GitHub/env-contours/FORM_functions_revised.R")
-source("~/GitHub/env-contours/predictive_llh_cross_validation.R")
-source("~/GitHub/R_packages/cond.extremes/R/thresh_select.R")
+source("FORM_functions.R")
+source("predictive_llh_cross_validation.R")
 library("stats")
 library("cond.extremes")
 
@@ -72,7 +70,7 @@ weibull_inv_rsblt = function(uh, shape_theta, scale_theta){
 
 # read in data ------------------------------------------------------------
 
-cnsTS = read.csv("data/cnsTS.txt")
+cnsTS = read.csv("cnsTS.txt")
 data = cnsTS
 hs <- c()
 t2 <- c()
@@ -124,17 +122,17 @@ if(neg){
 
 # fitting form ------------------------------------------------------------
 theta0 = c(scale_theta0, shape_theta0)
-p = 1e-3/72
+p = 1e-3/73
 form = form_fit_weibull(data, 0.8, theta0, plot=T, p=p, x_all=hs) 
 if(neg){
   form$y = -(form$y - max_stp - 0.001)
 }
 if (neg){
-  save(form, file=paste("~/GitHub/env-contours/FORM fits/negweibull_",
+  save(form, file=paste("negweibull_",
                         shape_abr, "_", scale_abr, "_form_p", p, sep=""))
 }
 if (1-neg){
-  save(form, file=paste("~/GitHub/env-contours/FORM fits/posweibull_",
+  save(form, file=paste("posweibull_",
                         shape_abr, "_", scale_abr, "_form_p", p, sep=""))
 }
 
@@ -143,10 +141,10 @@ if (1-neg){
 AIC = (2 * form$s2fit$value + 2 * length(form$s2fit$par))
 
 if (neg){
-  save(AIC, file=paste("~/GitHub/env-contours/FORM_AICs/negweibull_", shape_abr, "_", scale_abr, "_AIC", sep=""))
+  save(AIC, file=paste("negweibull_", shape_abr, "_", scale_abr, "_AIC", sep=""))
 }
 if (1-neg){
-  save(AIC, file=paste("~/GitHub/env-contours/FORM_AICs/posweibull_", shape_abr, "_", scale_abr, "_AIC", sep=""))
+  save(AIC, file=paste("posweibull_", shape_abr, "_", scale_abr, "_AIC", sep=""))
 }
 
 
@@ -219,11 +217,11 @@ if(1){
       }
       
       if (neg){
-        save(llh_mean_set, file=paste("~/GitHub/env-contours/FORM_cross_validation_scores/vary_par_forms/negweibullq",
+        save(llh_mean_set, file=paste("negweibullq",
                                       shape_abr, scale_abr, q_cv,"k",k, sep='_'))
       }
       if (1-neg){
-        save(llh_mean_set, file=paste("~/GitHub/env-contours/FORM_cross_validation_scores/vary_par_forms/posweibullq",
+        save(llh_mean_set, file=paste("posweibullq",
                                       shape_abr, scale_abr, q_cv,"k",k, sep='_'))
       }
     }
