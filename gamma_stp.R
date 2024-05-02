@@ -1,6 +1,6 @@
 # -------------------------------------------------------------------------
 
-source("FORM_functions_revised.R")
+source("FORM_functions.R")
 source("predictive_llh_cross_validation.R")
 library("stats")
 library("cond.extremes")
