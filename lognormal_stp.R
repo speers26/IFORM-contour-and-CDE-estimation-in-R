@@ -1,8 +1,6 @@
 ### R script to draw FORM/IFORM bivariate environmental contours ###
-setwd("~/GitHub/env-contours")
-source("~/GitHub/env-contours/FORM_functions_revised.R")
-source("~/GitHub/R_packages/cond.extremes/R/thresh_select.R")
-source("~/GitHub/env-contours/predictive_llh_cross_validation.R")
+source("FORM_functions_revised.R")
+source("predictive_llh_cross_validation.R")
 library("stats")
 library("cond.extremes")
 
@@ -128,18 +126,18 @@ if (neg){
 theta0 = c(mu_theta0, sig_theta0)
 
 # fitting form ------------------------------------------------------------
-p = 1e-3/72
+p = 1e-3/73
 fit = form_fit_lnorm(data, 0.8, theta0, plot=T, p=p, x_all=hs)
 
 if(neg){
   fit$y = -(fit$y - max_stp - 0.001)
 }
 if (neg){
-  save(fit, file=paste("~/GitHub/env-contours/FORM fits/neglnorm_",
+  save(fit, file=paste("neglnorm_",
                         mu_abr, "_", sig_abr, "_form_p", p, sep=""))
 }
 if (1-neg){
-  save(fit, file=paste("~/GitHub/env-contours/FORM fits/poslnorm_",
+  save(fit, file=paste("poslnorm_",
                         mu_abr, "_", sig_abr, "_form_p", p, sep=""))
 }
 
@@ -148,10 +146,10 @@ if (1-neg){
 AIC = (2 * fit$s2fit$value + 2 * length(fit$s2fit$par))
 
 if (neg){
-  save(AIC, file=paste("~/GitHub/env-contours/FORM_AICs/neglnorm_", mu_abr, "_", sig_abr, "_AIC", sep=""))
+  save(AIC, file=paste("neglnorm_", mu_abr, "_", sig_abr, "_AIC", sep=""))
 }
 if (1-neg){
-  save(AIC, file=paste("~/GitHub/env-contours/FORM_AICs/poslnorm_", mu_abr, "_", sig_abr, "_AIC", sep=""))
+  save(AIC, file=paste("poslnorm_", mu_abr, "_", sig_abr, "_AIC", sep=""))
 }
 
 
@@ -210,11 +208,11 @@ if(1){
         print(llh_mean_set)
       }
       if (neg){
-        save(llh_mean_set, file=paste("~/GitHub/env-contours/FORM_cross_validation_scores/vary_par_forms/neglnormq",
+        save(llh_mean_set, file=paste("neglnormq",
                                       mu_abr, sig_abr, q_cv,"k",k, sep='_'))
       }
       if (1-neg){
-        save(llh_mean_set, file=paste("~/GitHub/env-contours/FORM_cross_validation_scores/vary_par_forms/poslnormq",
+        save(llh_mean_set, file=paste("poslnormq",
                                       mu_abr, sig_abr, q_cv,"k",k, sep='_'))
       }
     }
