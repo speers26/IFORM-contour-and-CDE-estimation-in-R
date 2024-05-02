@@ -1,4 +1,3 @@
-setwd("~/GitHub/env-contours")
 library("pracma")
 
 # get contours  -----------------------------------------------------------
@@ -22,8 +21,8 @@ for (i in 1:length(fits)){
 
 # load cond_density -------------------------------------------------------
 
-cond_dens = read.csv("~/GitHub/environment-modelling/data/cond_dens_pos.csv")
-dens = read.csv("~/GitHub/environment-modelling/data/env_probs.csv")
+cond_dens = read.csv("cond_dens_pos.csv") # currently for structure B, can load in different file for others
+dens = read.csv("env_probs.csv")
 cond_dens = cond_dens/sum(cond_dens)
 
 # calculate integral ------------------------------------------------------
