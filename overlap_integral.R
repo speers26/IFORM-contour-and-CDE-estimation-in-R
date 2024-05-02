@@ -4,7 +4,7 @@ library("pracma")
 fits =  c("neggev_exp_exp", "negweibull_exp_exp", "neglnorm_lin_lin", "neggamma_qua_lin",
           "posgev_exp_qua", "posweibull_lin_qua", "poslnorm_qua_exp", "posgamma_lin_lin")
 
-file_names = paste("FORM fits/",sapply((sapply(fits, list.files, path="FORM fits", simplify=FALSE)), '[[', 1), sep="")
+file_names = paste("form_fits/",sapply((sapply(fits, list.files, path="form_fits", simplify=FALSE)), '[[', 1), sep="")
 
 for (i in 1:length(fits)){
   load(file_names[i])
@@ -30,7 +30,7 @@ cond_dens = cond_dens/sum(cond_dens)
 overlap_int = function(cntr, cell_x, cell_y, dens, plot=F){
   if (plot){
     plot(cell_x, cell_y)
-    mask = inpolygon(cell_x, cell_y, cntr$x, cntr$y) 
+    mask = inpolygon(cell_x, cell_y, cntr$x, cntr$y)
     points(cell_x[mask], cell_y[mask], col="yellow")
   }
   sum(inpolygon(cell_x, cell_y, cntr$x, cntr$y) * dens)
