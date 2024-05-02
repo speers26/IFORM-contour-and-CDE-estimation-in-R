@@ -1,8 +1,8 @@
 library(cond.extremes)
-source("~FORM_functions.R")
+source("FORM_functions.R")
 
 ## read in data
-data <- read.csv("data/cnsTS.txt")
+data <- read.csv("cnsTS.txt")
 
 ## isolate peaks
 hs_peak <- c()
