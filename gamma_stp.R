@@ -1,9 +1,7 @@
 # -------------------------------------------------------------------------
 
-setwd("~/GitHub/env-contours")
-source("~/GitHub/env-contours/FORM_functions_revised.R")
-source("~/GitHub/R_packages/cond.extremes/R/thresh_select.R")
-source("~/GitHub/env-contours/predictive_llh_cross_validation.R")
+source("FORM_functions_revised.R")
+source("predictive_llh_cross_validation.R")
 library("stats")
 library("cond.extremes")
 
@@ -130,7 +128,7 @@ if (1-neg){
 }
 
 # make FORM ---------------------------------------------------------------
-p = 1e-3/72
+p = 1e-3/73
 theta0 = c(shape_theta0, rate_theta0)
 form = form_fit_gamma(data, 0.8, theta0, plot=T, p=p, x_all=hs)
 
@@ -138,11 +136,11 @@ if(neg){
   form$y = -(form$y - max_stp - 0.001)
 }
 if (neg){
-  save(form, file=paste("~/GitHub/env-contours/FORM fits/neggamma_",
+  save(form, file=paste("neggamma_",
                         shape_abr, "_", rate_abr, "_form_p", p, sep=""))
 }
 if (1-neg){
-  save(form, file=paste("~/GitHub/env-contours/FORM fits/posgamma_",
+  save(form, file=paste("posgamma_",
                         shape_abr, "_", rate_abr, "_form_p", p, sep=""))
 }
 
@@ -151,10 +149,10 @@ if (1-neg){
 AIC = (2 * form$s2fit$value + 2 * length(form$s2fit$par))
 
 if (neg){
-  save(AIC, file=paste("~/GitHub/env-contours/FORM_AICs/neggamma_", shape_abr, "_", rate_abr, "_AIC", sep=""))
+  save(AIC, file=paste("neggamma_", shape_abr, "_", rate_abr, "_AIC", sep=""))
 }
 if (1-neg){
-  save(AIC, file=paste("~/GitHub/env-contours/FORM_AICs/posgamma_", shape_abr, "_", rate_abr, "_AIC", sep=""))
+  save(AIC, file=paste("posgamma_", shape_abr, "_", rate_abr, "_AIC", sep=""))
 }
 
 
@@ -227,11 +225,11 @@ if(1){
         print(llh_mean_set)
       }
       if (neg){
-        save(llh_mean_set, file=paste("~/GitHub/env-contours/FORM_cross_validation_scores/vary_par_forms/neggammaq",
+        save(llh_mean_set, file=paste("neggammaq",
                                       shape_abr, rate_abr, q_cv,"k",k, sep='_'))
       }
       if (1-neg){
-        save(llh_mean_set, file=paste("~/GitHub/env-contours/FORM_cross_validation_scores/vary_par_forms/posgammaq",
+        save(llh_mean_set, file=paste("posgammaq",
                                       shape_abr, rate_abr, q_cv,"k",k, sep='_'))
       }
     }
