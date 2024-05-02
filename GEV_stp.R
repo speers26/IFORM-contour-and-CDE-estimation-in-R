@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------
-source("FORM_functions_revised.R")
+source("FORM_functions.R")
 source("predictive_llh_cross_validation.R")
 library("stats")
 library("cond.extremes")
@@ -134,7 +134,7 @@ if(neg){
 # fitting form ------------------------------------------------------------
 
 theta0 = c(mu_theta_0, sig_theta_0)
-p = 1e-3/72
+p = 1e-3/73
 form = form_fit_GEV(data, 0.8, theta0, plot=T, p=p)
 if(neg){
   form$y = -(form$y - max_stp - 0.001)
