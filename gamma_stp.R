@@ -72,7 +72,7 @@ gamma_inv_rsblt = function(uh, shape_theta, rate_theta){
 
 # read in data ------------------------------------------------------------
 
-cnsTS = read.csv("data/cnsTS.txt")
+cnsTS = read.csv("cnsTS.txt")
 data = cnsTS
 hs <- c()
 t2 <- c()
