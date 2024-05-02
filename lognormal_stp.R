@@ -1,5 +1,5 @@
 ### R script to draw FORM/IFORM bivariate environmental contours ###
-source("FORM_functions_revised.R")
+source("FORM_functions.R")
 source("predictive_llh_cross_validation.R")
 library("stats")
 library("cond.extremes")
@@ -70,7 +70,7 @@ lnorm_inv_rsn = function(uh, theta, stp=T){
 }
 
 # read in data ------------------------------------------------------------
-cnsTS = read.csv("data/cnsTS.txt")
+cnsTS = read.csv("cnsTS.txt")
 data = cnsTS
 hs <- c()
 tp <- c()
