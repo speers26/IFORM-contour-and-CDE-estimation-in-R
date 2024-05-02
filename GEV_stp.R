@@ -1,9 +1,6 @@
 # -------------------------------------------------------------------------
-
-setwd("~/GitHub/env-contours")
-source("~/GitHub/env-contours/FORM_functions_revised.R")
-source("~/GitHub/R_packages/cond.extremes/R/thresh_select.R")
-source("~/GitHub/env-contours/predictive_llh_cross_validation.R")
+source("FORM_functions_revised.R")
+source("predictive_llh_cross_validation.R")
 library("stats")
 library("cond.extremes")
 
@@ -80,7 +77,7 @@ GEV_inv_rsblt = function(uh, mu_theta, sig_theta, xi){
 
 # read in data ------------------------------------------------------------
 
-cnsTS = read.csv("data/cnsTS.txt")
+cnsTS = read.csv("cnsTS.txt")
 data = cnsTS
 hs <- c()
 t2 <- c()
@@ -143,11 +140,11 @@ if(neg){
   form$y = -(form$y - max_stp - 0.001)
 }
 if (neg){
-  save(form, file=paste("~/GitHub/env-contours/FORM fits/neggev_",
+  save(form, file=paste("neggev_",
                         mu_abr, "_", sig_abr, "_form_p", p, sep=""))
 }
 if (1-neg){
-  save(form, file=paste("~/GitHub/env-contours/FORM fits/posgev_",
+  save(form, file=paste("posgev_",
                         mu_abr, "_", sig_abr, "_form_p", p, sep=""))
 }
 
@@ -156,10 +153,10 @@ if (1-neg){
 AIC = (2 * form$s2fit$value + 2 * length(form$s2fit$par) + 2)
 
 if (neg){
-  save(AIC, file=paste("~/GitHub/env-contours/FORM_AICs/neggev_", mu_abr, "_", sig_abr, "_AIC", sep=""))
+  save(AIC, file=paste("neggev_", mu_abr, "_", sig_abr, "_AIC", sep=""))
 }
 if (1-neg){
-  save(AIC, file=paste("~/GitHub/env-contours/FORM_AICs/posgev_", mu_abr, "_", sig_abr, "_AIC", sep=""))
+  save(AIC, file=paste("posgev_", mu_abr, "_", sig_abr, "_AIC", sep=""))
 }
 
 # checking stp parameter form ---------------------------------------------
@@ -221,11 +218,11 @@ if(1){
         print(llh_mean_set)
       }
       if (neg){
-        save(llh_mean_set, file=paste("~/GitHub/env-contours/FORM_cross_validation_scores/vary_par_forms/neggevq",
+        save(llh_mean_set, file=paste("neggevq",
                                       mu_abr, sig_abr, q_cv,"k",k, sep='_'))
       }
       if (1-neg){
-        save(llh_mean_set, file=paste("~/GitHub/env-contours/FORM_cross_validation_scores/vary_par_forms/posgevq",
+        save(llh_mean_set, file=paste("posgevq",
                                       mu_abr, sig_abr,q_cv,"k",k, sep='_'))
       }
     }
