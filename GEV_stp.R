@@ -6,10 +6,10 @@ library("cond.extremes")
 
 # overall function --------------------------------------------------------
 form_fit_GEV = function(data, q, theta0, plot=F, p=1e-5){
-  
+
   # fitting hs --------------------------------------------------------------
   hsfit = gpd.fit(hs, quantile(hs, q), show=F)
-  
+
   # fitting stp model -------------------------------------------------------
   xi = gev.fit(data[,2], show=FALSE)$mle[3]
   s2fit = optim(theta0, GEV_nll, data=data, xi=xi, range_y=range(data[,2]))
@@ -33,19 +33,19 @@ form_fit_GEV = function(data, q, theta0, plot=F, p=1e-5){
     plot(data[,1], data[,2], cex=0.5, pch=16)
     lines(FORM_x, FORM_y, col="red")
   }
-  
+
   return(list(hsfit=hsfit, s2fit=s2fit, xi=xi, x=FORM_x, y=FORM_y))
 }
 
 # fitting stp model functions  --------------------------------------------
 
 GEV_nll = function(data, all_theta, xi, range_y){
-  
+
   x = data[,1] ; y = data[,2]
-  
+
   mu = mu_func(all_theta[1:3], x)
   sig = sig_func(all_theta[4:6], x)
-  
+
   if(sum(sig<=0)>0){
     #print("1")
     return(1e10)
@@ -55,35 +55,35 @@ GEV_nll = function(data, all_theta, xi, range_y){
     return(1e10)
   }
   if(xi<0 & sum(range_y[2]>(mu-sig/xi))>0){
-    #print("3") 
+    #print("3")
     return(1e10)
   }
-  
+
   return(-sum(dgev(y, location=mu, scale=sig, shape=xi, log=TRUE)))
-  
+
 }
 GEV_inv_rsblt = function(uh, mu_theta, sig_theta, xi){
-  
+
   u = uh[1] ; h = uh[2]
-  
-  mu = mu_func(mu_theta, h) 
+
+  mu = mu_func(mu_theta, h)
   sigma = sig_func(sig_theta, h)
-  
+
   p = pnorm(u)
-  
+
   qgev(p, location=mu, scale=sigma, shape=xi)
-  
+
 }
 
 # read in data ------------------------------------------------------------
 
-cnsTS = read.csv("cnsTS.txt")
-data = cnsTS
+data = read.csv("data.txt")
+
 hs <- c()
 t2 <- c()
-for (i in 1:max(data$StrIdn)){
-  hs[i] <- max(data$Hs[data$StrIdn == i])
-  t2[i] <- max(data$T2[data$StrIdn == i])
+for (i in 1:max(data$Idn)){
+  hs[i] <- max(data$Hs[data$Idn == i])
+  t2[i] <- max(data$T2[data$Idn == i])
 }
 
 neg = T
@@ -148,7 +148,7 @@ if (1-neg){
                         mu_abr, "_", sig_abr, "_form_p", p, sep=""))
 }
 
-# 
+#
 # AIC ---------------------------------------------------------------------
 AIC = (2 * form$s2fit$value + 2 * length(form$s2fit$par) + 2)
 
@@ -162,12 +162,12 @@ if (1-neg){
 # checking stp parameter form ---------------------------------------------
 
 banded_pars_GEV = function(data, k){
-  
+
   data[,2] = data[,2][order(data[,1])] ; data[,1] = sort(data[,1])
   bands = get_bands(data, k)
   fit = lapply(bands$bandsY, gev.fit, show=F)
   mles = lapply(fit, '[[', 7)
-  
+
   return(list(x = sapply(bands$bandsX, median),
               mu = as.numeric(lapply(mles, '[[', 1)),
               sigma = as.numeric(lapply(mles, '[[', 2)),
@@ -196,7 +196,7 @@ set.seed(1)
 if(1){
   R = 30 ; q = 0.9
   k_set = c(5,10) ; q_cv_set = c(0.8, 0.9, 0)
-  
+
   for (q_cv in q_cv_set){
     print(q_cv)
     for (k in k_set){

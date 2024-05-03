@@ -6,77 +6,76 @@ library("cond.extremes")
 
 # overall function --------------------------------------------------------
 form_fit_lnorm = function(data, q, theta0, plot=F, p=1e-5, x_all){
-  
+
   # fit hs
   v = quantile(data[,1], q, names=F)
   hsfit = gpd.fit(data[,1], q, show=FALSE)
-  
+
   # fit s2
   s2fit = optim(theta0, lgnrm_NLL, data=data, x_all=x_all)
-  
+
   # making FORM
   beta = qnorm(1-p)
   u_ctr = (beta*exp(2i * pi * (1:10000)/10000))
-  
+
   FORM_x = sapply(pnorm(Re(u_ctr)), FUN=qspliced, x=hs, q=q, gpd_par=hsfit$mle)
   uh_matrix = matrix(data=c(Im(u_ctr), FORM_x), ncol=2)
   FORM_y = apply(uh_matrix, 1, lnorm_inv_rsn, theta=s2fit$par)
-  
+
   # plotting
   if (plot){
     plot(data[,1], data[,2], cex=0.5, pch=16) ; lines(FORM_x, FORM_y, col="red")
   }
-  
+
   return(list(hsfit=hsfit, s2fit=s2fit, x=FORM_x, y=FORM_y))
-  
+
 }
 
 # fitting parametric form functions ---------------------------------------
 
 
 lgnrm_NLL = function(data, theta, x_all){
-  
+
   x = data[,1] ; y = data[,2]
   mu_theta = theta[1:3] ; sd_theta = theta[4:6]
-  
+
   mu_val = mu(mu_theta, x)
   sd_val = sigma(sd_theta, x)
-  
+
   sd_val_all = sigma(sd_theta, x_all)
-  
+
   if(sum(sd_val_all<=0)>0){
     #print("hi")
     return(1e10)
   }
-  
+
   return(-sum(dlnorm(y, meanlog=mu_val, sdlog=sd_val, log=TRUE)))
-  
+
 }
 
 lnorm_inv_rsn = function(uh, theta, stp=T){
-  
+
   u = uh[1] ; h = uh[2]
   # extract parameters from theta
   mu = mu(theta[1:3], h) ; sigma = sigma(theta[4:6], h)
-  
+
   # get normal probability
   p = pnorm(u)
-  
+
   # inverse cdf
   x = qlnorm(p, meanlog=mu, sdlog=sigma)
-  
+
   return(x)
-  
+
 }
 
 # read in data ------------------------------------------------------------
-cnsTS = read.csv("cnsTS.txt")
-data = cnsTS
+data = read.csv("data.txt")
 hs <- c()
 tp <- c()
-for (i in 1:max(data$StrIdn)){
-  hs[i] <- max(data$Hs[data$StrIdn == i])
-  tp[i] <- max(data$T2[data$StrIdn == i])
+for (i in 1:max(data$Idn)){
+  hs[i] <- max(data$Hs[data$Idn == i])
+  tp[i] <- max(data$T2[data$Idn == i])
 }
 
 stp = (hs*2*pi)/(tp^2*9.81)
@@ -118,7 +117,7 @@ if (neg){
   )
   sig_theta0 = switch(sig_type,
                       "exponential" = c(0.2534281, -0.2465539, -1.0508090),
-                      "quadratic" =  c(0.005, 0.1, 0.15), 
+                      "quadratic" =  c(0.005, 0.1, 0.15),
                       "linear" =  c(0.1, 0.05, 0)
   )
 }
@@ -141,7 +140,7 @@ if (1-neg){
                         mu_abr, "_", sig_abr, "_form_p", p, sep=""))
 }
 
-# 
+#
 # AIC ---------------------------------------------------------------------
 AIC = (2 * fit$s2fit$value + 2 * length(fit$s2fit$par))
 
@@ -155,13 +154,13 @@ if (1-neg){
 
 # check parametric form fit k--------------------------------------------
 banded_pars = function(data, k){
-  
+
   data[,2] = data[,2][order(data[,1])] ; data[,1] = sort(data[,1])
   bands = get_bands(data, k)
   log_bands = lapply(bands$bandsY, log)
   mus = lapply(log_bands, mean)
   sds = lapply(log_bands, sd)
-  
+
   return(list(x = sapply(bands$bandsX, median),
               mu = mus,
               sd = sds)
@@ -186,7 +185,7 @@ set.seed(1)
 if(1){
   R = 30 ; q = 0.9
   k_set = c(5, 10) ; q_cv_set = c(0, 0.8, 0.9)
-  
+
   for (q_cv in q_cv_set){
     print(q_cv)
     for (k in k_set){

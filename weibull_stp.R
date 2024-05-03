@@ -7,22 +7,22 @@ library("cond.extremes")
 
 # overall function --------------------------------------------------------
 form_fit_weibull = function(data, q, theta0, plot=F, p=1e-5, x_all){
-  
+
   # fitting hs --------------------------------------------------------------
   hsfit = gpd.fit(hs, quantile(hs, q), show=F)
-  
+
   # fitting stp model -------------------------------------------------------
   s2fit = optim(c(shape_theta0, scale_theta0), dep_weibull_nll, data=data, x_all=x_all)
-  
+
   # making form -------------------------------------------------------------
   beta = qnorm(1-p)
   u_ctr = (beta*exp(2i * pi * (1:10000)/10000))
-  
+
   FORM_x = sapply(pnorm(Re(u_ctr)), FUN=qspliced, x=data[,1], q=q, gpd_par=hsfit$mle)
   uh_matrix = matrix(data=c(Im(u_ctr), FORM_x), ncol=2)
   FORM_y = apply(uh_matrix, 1, weibull_inv_rsblt, shape_theta = s2fit$par[1:3],
-                 scale_theta = s2fit$par[4:6]) 
-  
+                 scale_theta = s2fit$par[4:6])
+
   # plotting ----------------------------------------------------------------
   if (plot){
     plot(data[,1], data[,2], cex=0.5, pch=16)
@@ -34,49 +34,48 @@ form_fit_weibull = function(data, q, theta0, plot=F, p=1e-5, x_all){
 # fitting stp modelfunctions -------------------------------------------------
 
 dep_weibull_nll = function(data, all_theta, x_all){
-  
+
   x = data[,1] ; y = data[,2]
-  
+
   shape = shape_func(all_theta[1:3], x)
   scale = scale_func(all_theta[4:6], x)
-  
+
   shape_all = shape_func(all_theta[1:3], x_all)
   scale_all = scale_func(all_theta[4:6], x_all)
-  
+
   if(sum(shape_all<=0)>0){
     return(1e10)
   }
   if(sum(scale_all<=0)>0){
     return(1e10)
   }
-  
+
   return(-sum(dweibull(y, shape=shape, scale=scale, log=TRUE)))
-  
+
 }
 
 weibull_inv_rsblt = function(uh, shape_theta, scale_theta){
-  
+
   u = uh[1] ; h = uh[2]
-  
+
   shape = shape_func(shape_theta, h)
   scale = scale_func(scale_theta, h)
-  
+
   p = pnorm(u)
-  
+
   qweibull(p, shape=shape, scale=scale)
-  
+
 }
 
 
 # read in data ------------------------------------------------------------
 
-cnsTS = read.csv("cnsTS.txt")
-data = cnsTS
+data = read.csv("data.txt")
 hs <- c()
 t2 <- c()
-for (i in 1:max(data$StrIdn)){
-  hs[i] <- max(data$Hs[data$StrIdn == i])
-  t2[i] <- max(data$T2[data$StrIdn == i])
+for (i in 1:max(data$Idn)){
+  hs[i] <- max(data$Hs[data$Idn == i])
+  t2[i] <- max(data$T2[data$Idn == i])
 }
 
 neg = T
@@ -123,7 +122,7 @@ if(neg){
 # fitting form ------------------------------------------------------------
 theta0 = c(scale_theta0, shape_theta0)
 p = 1e-3/73
-form = form_fit_weibull(data, 0.8, theta0, plot=T, p=p, x_all=hs) 
+form = form_fit_weibull(data, 0.8, theta0, plot=T, p=p, x_all=hs)
 if(neg){
   form$y = -(form$y - max_stp - 0.001)
 }
@@ -136,7 +135,7 @@ if (1-neg){
                         shape_abr, "_", scale_abr, "_form_p", p, sep=""))
 }
 
-# 
+#
 # AIC ---------------------------------------------------------------------
 AIC = (2 * form$s2fit$value + 2 * length(form$s2fit$par))
 
@@ -166,7 +165,7 @@ banded_pars_weibull = function(data, k){
   bands = get_bands(data, k)
   fit = lapply(bands$bandsY, weibull_fit, theta0=c(1,1))
   mles = lapply(fit, '[[', 1)
-  
+
   return(list(x = sapply(bands$bandsX, median),
               shape = as.numeric(lapply(mles, '[[', 1)),
               scale = as.numeric(lapply(mles, '[[', 2)))
@@ -215,7 +214,7 @@ if(1){
         llh_mean_set[r] = (mean(llh))
         print(llh_mean_set)
       }
-      
+
       if (neg){
         save(llh_mean_set, file=paste("negweibullq",
                                       shape_abr, scale_abr, q_cv,"k",k, sep='_'))

@@ -7,27 +7,27 @@ library("cond.extremes")
 
 # overall function --------------------------------------------------------
 form_fit_gamma = function(data, q, theta0, plot=F, p=1e-5, x_all){
-  
+
   # fitting hs --------------------------------------------------------------
   hsfit = gpd.fit(hs, quantile(hs, q), show=F)
-  
+
   # fitting stp model -------------------------------------------------------
   s2fit = optim(theta0, dep_gamma_nll, data=data, x_all=x_all)
-  
+
   # making form -------------------------------------------------------------
   beta = qnorm(1-p)
   u_ctr = (beta*exp(2i * pi * (1:10000)/10000))
-  
+
   FORM_x = sapply(pnorm(Re(u_ctr)), FUN=qspliced, x=hs, q=q, gpd_par=hsfit$mle)
   uh_matrix = matrix(data=c(Im(u_ctr), FORM_x), ncol=2)
   FORM_y = apply(uh_matrix, 1, gamma_inv_rsblt, shape_theta = s2fit$par[1:3],
                  rate_theta = s2fit$par[4:6])
-  
+
   # plotting ---------------------------------------------------------------
   if (plot){
     plot(data[,1], data[,2], xlim=c(1, 16), cex=0.5, pch=16) ; lines(FORM_x, FORM_y, col="red")
   }
-  
+
   return(list(hsfit=hsfit, s2fit=s2fit, x=FORM_x, y=FORM_y))
 }
 
@@ -35,15 +35,15 @@ form_fit_gamma = function(data, q, theta0, plot=F, p=1e-5, x_all){
 # fitting parametric form functions ---------------------------------------
 
 dep_gamma_nll = function(data, all_theta, x_all){
-  
+
   x = data[,1] ; y = data[,2]
-  
+
   shape = shape_func(all_theta[1:3], x)
   rate = rate_func(all_theta[4:6], x)
-  
+
   shape_all = shape_func(all_theta[1:3], x_all)
   rate_all = rate_func(all_theta[4:6], x_all)
-  
+
   if(sum(shape_all<=0)>0){
     #print("1")
     return(1e10)
@@ -52,33 +52,32 @@ dep_gamma_nll = function(data, all_theta, x_all){
     #print("2")
     return(1e10)
   }
-  
+
   return(-sum(dgamma(y, shape=shape, rate=rate, log=TRUE)))
-  
+
 }
 
 gamma_inv_rsblt = function(uh, shape_theta, rate_theta){
-  
+
   u = uh[1] ; h = uh[2]
-  
+
   shape = shape_func(shape_theta, h)
   rate = rate_func(rate_theta, h)
-  
+
   p = pnorm(u)
-  
+
   qgamma(p, shape=shape, rate=rate)
-  
+
 }
 
 # read in data ------------------------------------------------------------
 
-cnsTS = read.csv("cnsTS.txt")
-data = cnsTS
+data = read.csv("data.txt")
 hs <- c()
 t2 <- c()
-for (i in 1:max(data$StrIdn)){
-  hs[i] <- max(data$Hs[data$StrIdn == i])
-  t2[i] <- max(data$T2[data$StrIdn == i])
+for (i in 1:max(data$Idn)){
+  hs[i] <- max(data$Hs[data$Idn == i])
+  t2[i] <- max(data$T2[data$Idn == i])
 }
 
 neg = T
@@ -144,7 +143,7 @@ if (1-neg){
                         shape_abr, "_", rate_abr, "_form_p", p, sep=""))
 }
 
-# 
+#
 # AIC ---------------------------------------------------------------------
 AIC = (2 * form$s2fit$value + 2 * length(form$s2fit$par))
 
@@ -170,12 +169,12 @@ gamma_fit = function(x, theta0){
 }
 
 banded_pars_gamma = function(data, k){
-  
+
   data[,2] = data[,2][order(data[,1])] ; data[,1] = sort(data[,1])
   bands = get_bands(data, k)
   fit = lapply(bands$bandsY, gamma_fit, theta0=c(1,1))
   mles = lapply(fit, '[[', 1)
-  
+
   return(list(x = sapply(bands$bandsX, median),
               shape = as.numeric(lapply(mles, '[[', 1)),
               rate = as.numeric(lapply(mles, '[[', 2)))
@@ -203,7 +202,7 @@ set.seed(1)
 if(1){
   R = 30 ; q = 0.9
   k_set = c(5, 10) ; q_cv_set = c(0.8, 0.9, 0)
-  
+
   for (q_cv in q_cv_set){
     print(q_cv)
     for (k in k_set){
